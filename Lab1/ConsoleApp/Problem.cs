@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ConsoleApp
 {
@@ -59,6 +58,8 @@ namespace ConsoleApp
                     capacityLeft -= Items[i - 1].Weight;
                 }
             }
+            resultItems = resultItems.OrderBy(i => i.Id).ToList();
+
             return new Result(resultItems);
         }
     }

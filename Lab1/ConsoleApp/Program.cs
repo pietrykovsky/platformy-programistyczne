@@ -27,7 +27,7 @@ namespace ConsoleApp
         {
             foreach (var item in items)
             {
-                item.Print();
+                Console.WriteLine(item.ToString());
             }
         }
     }

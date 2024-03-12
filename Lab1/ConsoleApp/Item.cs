@@ -20,10 +20,5 @@ namespace ConsoleApp
         {
             return $"Id: {Id}, Value: {Value}, Weight: {Weight}";
         }
-
-        public void Print()
-        {
-            Console.WriteLine(ToString());
-        }
     }
 }
