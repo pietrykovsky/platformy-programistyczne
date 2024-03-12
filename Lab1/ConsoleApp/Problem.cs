@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace ConsoleApp
 {
-    public class Problem
+    public class Problem : BaseItemsContainer
     {
         private int _itemsCount;
         private int _seed;
-        public List<Item> Items { get; set; }
 
         public Problem(int itemsCount, int seed)
         {
@@ -30,8 +31,35 @@ namespace ConsoleApp
 
         public Result Solve(int capacity)
         {
-            var result = new Result(new List<Item>());
-            return result;
+            int[,] dp = new int[Items.Count + 1, capacity + 1];
+
+            for (int i = 1; i <= Items.Count; i++)
+            {
+                for (int w = 1; w <= capacity; w++)
+                {
+                    if (Items[i - 1].Weight <= w)
+                    {
+                        dp[i, w] = Math.Max(dp[i - 1, w], dp[i - 1, w - Items[i - 1].Weight] + Items[i - 1].Value);
+                    }
+                    else
+                    {
+                        dp[i, w] = dp[i - 1, w];
+                    }
+                }
+            }
+
+            // Backtrack to find which items to include
+            List<Item> resultItems = new List<Item>();
+            int capacityLeft = capacity;
+            for (int i = Items.Count; i > 0 && capacityLeft > 0; i--)
+            {
+                if (dp[i, capacityLeft] != dp[i - 1, capacityLeft])
+                {
+                    resultItems.Add(Items[i - 1]);
+                    capacityLeft -= Items[i - 1].Weight;
+                }
+            }
+            return new Result(resultItems);
         }
     }
 }

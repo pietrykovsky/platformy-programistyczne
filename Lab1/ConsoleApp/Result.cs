@@ -4,10 +4,8 @@ using System.Linq;
 
 namespace ConsoleApp
 {
-    public class Result
+    public class Result : BaseItemsContainer
     {
-        public List<Item> Items { get; set; }
-
         public Result(List<Item> items)
         {
             Items = items;
@@ -21,9 +19,10 @@ namespace ConsoleApp
         {
             var sb = new StringBuilder();
             sb.AppendLine("Items:");
-            foreach (var item in Items)
+            var items = Items.OrderBy(i => i.Value/i.Weight);
+            foreach (var item in items)
             {
-                sb.AppendLine($"\tId: {item.Id}, Value: {item.Value}, Weight: {item.Weight}");
+                sb.AppendLine($"\t{item.ToString()}");
             }
             sb.AppendLine($"Total value: {TotalValue()}");
             sb.AppendLine($"Total weight: {TotalWeight()}");

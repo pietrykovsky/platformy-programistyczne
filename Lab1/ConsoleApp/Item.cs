@@ -16,9 +16,14 @@ namespace ConsoleApp
             Weight = weight;
         }
 
+        public override string ToString()
+        {
+            return $"Id: {Id}, Value: {Value}, Weight: {Weight}";
+        }
+
         public void Print()
         {
-            Console.WriteLine($"Id: {Id}, Value: {Value}, Weight: {Weight}");
+            Console.WriteLine(ToString());
         }
     }
 }
