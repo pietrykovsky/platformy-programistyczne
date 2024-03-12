@@ -19,5 +19,15 @@ namespace ConsoleApp
             }
             return sb.ToString();
         }
+
+        public List<string> ItemsToListOfStrings()
+        {
+            var items = new List<string>();
+            foreach (var item in Items)
+            {
+                items.Add(item.ToString());
+            }
+            return items;
+        }
     }
 }

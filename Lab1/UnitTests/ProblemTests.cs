@@ -104,7 +104,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void BaseItemsContainer_ToString_ReturnsExpectedString()
+        public void BaseItemsContainer_ItemsToListOfStrings_ReturnsExpectedString()
         {
             var container = new BaseItemsContainer();
             container.Items = new List<Item>
@@ -112,8 +112,19 @@ namespace UnitTests
                 new Item(1, 1, 1),
                 new Item(2, 2, 2)
             };
-            var expected = "Id: 1, Value: 1, Weight: 1\nId: 2, Value: 2, Weight: 2\n";
-            Assert.Equal(expected, container.ItemsToString());
+            var expected = new List<string>
+            {
+                "Id: 1, Value: 1, Weight: 1",
+                "Id: 2, Value: 2, Weight: 2"
+            };
+
+            var items = container.ItemsToListOfStrings();
+
+            Assert.Equal(expected.Count, items.Count);
+            for (int i = 0; i < expected.Count; i++)
+            {
+                Assert.Equal(expected[i], items[i]);
+            }
         }
         
         [Fact]

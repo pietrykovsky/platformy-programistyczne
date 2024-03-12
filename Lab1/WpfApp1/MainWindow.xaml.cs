@@ -8,51 +8,43 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
 using ConsoleApp;
 
-namespace WpfApp1
+namespace WpfApp
 {
 
     public partial class MainWindow : Window
     {
-        private int _numberofitems;
+        private int _itemsCount;
         private int _seed;
         private int _capacity;
-        private string _resultlist;
-        private string _instacelist;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void ItemsCountTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _numberofitems = int.Parse(Content1.Text);
+            _itemsCount = !string.IsNullOrEmpty(ItemsCountTextBox.Text) ? int.Parse(ItemsCountTextBox.Text) : 0;
         }
 
-        private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
+        private void SeedTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _seed = int.Parse(Content2.Text);
+            _seed = !string.IsNullOrEmpty(SeedTextBox.Text) ? int.Parse(SeedTextBox.Text) : 0;
         }
 
-        private void TextBox_TextChanged_2(object sender, TextChangedEventArgs e)
+        private void CapacityTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _capacity = int.Parse(Content3.Text);
+            _capacity = !string.IsNullOrEmpty(CapacityTextBox.Text) ? int.Parse(CapacityTextBox.Text) : 0;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var problem = new Problem(_numberofitems, _seed);
+            var problem = new Problem(_itemsCount, _seed);
             var result = problem.Solve(_capacity);
-            _resultlist = result.ItemsToString();
-            _instacelist = problem.ItemsToString();
-
-
-            list1.ItemsSource = _resultlist;
-            list2.ItemsSource = _instacelist;
-
+            ResultList.ItemsSource = result.ItemsToListOfStrings();
+            ItemsList.ItemsSource = problem.ItemsToListOfStrings();
         }
     }
 }
