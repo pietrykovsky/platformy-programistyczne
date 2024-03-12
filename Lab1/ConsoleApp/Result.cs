@@ -1,30 +1,33 @@
 ﻿using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace ConsoleApp;
-
-public class Result
+namespace ConsoleApp
 {
-    public List<Item> Items { get; set; }
-
-    public Result(List<Item> items)
+    public class Result
     {
-        Items = items;
-    }
+        public List<Item> Items { get; set; }
 
-    public int TotalValue() => Items.Sum(i => i.Value);
-
-    public int TotalWeight() => Items.Sum(i => i.Weight);
-
-    public override string ToString()
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("Items:");
-        foreach (var item in Items)
+        public Result(List<Item> items)
         {
-            sb.AppendLine($"\tId: {item.Id}, Value: {item.Value}, Weight: {item.Weight}");
+            Items = items;
         }
-        sb.AppendLine($"Total value: {TotalValue()}");
-        sb.AppendLine($"Total weight: {TotalWeight()}");
-        return sb.ToString();
+
+        public int TotalValue() => Items.Sum(i => i.Value);
+
+        public int TotalWeight() => Items.Sum(i => i.Weight);
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Items:");
+            foreach (var item in Items)
+            {
+                sb.AppendLine($"\tId: {item.Id}, Value: {item.Value}, Weight: {item.Weight}");
+            }
+            sb.AppendLine($"Total value: {TotalValue()}");
+            sb.AppendLine($"Total weight: {TotalWeight()}");
+            return sb.ToString();
+        }
     }
 }

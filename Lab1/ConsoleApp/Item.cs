@@ -1,21 +1,24 @@
-﻿namespace ConsoleApp;
+﻿using System;
 
-public class Item
+namespace ConsoleApp
 {
-    private int _id;
-    public int Id { get => _id; }
-    public int Value { get; set; }
-    public int Weight { get; set; }
-
-    public Item(int id, int value, int weight)
+    public class Item
     {
-        _id = id;
-        Value = value;
-        Weight = weight;
-    }
+        private int _id;
+        public int Id { get => _id; }
+        public int Value { get; set; }
+        public int Weight { get; set; }
 
-    public void Print()
-    {
-        Console.WriteLine($"Id: {Id}, Value: {Value}, Weight: {Weight}");
+        public Item(int id, int value, int weight)
+        {
+            _id = id;
+            Value = value;
+            Weight = weight;
+        }
+
+        public void Print()
+        {
+            Console.WriteLine($"Id: {Id}, Value: {Value}, Weight: {Weight}");
+        }
     }
 }
