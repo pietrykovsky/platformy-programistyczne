@@ -26,18 +26,49 @@ namespace WpfApp
 
         private void ItemsCountTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _itemsCount = !string.IsNullOrEmpty(ItemsCountTextBox.Text) ? int.Parse(ItemsCountTextBox.Text) : 0;
+            if (int.TryParse(ItemsCountTextBox.Text, out int value) && value >= 0)
+            {
+                _itemsCount = value;
+                ItemsCountTextBox.Background = new SolidColorBrush(Colors.Pink);
+            }
+            else
+            {
+                _itemsCount = 0;
+                ItemsCountTextBox.Background = new SolidColorBrush(Colors.LightPink);
+                MessageBox.Show("Wprowadzona wartość dla liczby przedmiotów jest nieprawidłowa. Proszę wprowadzić liczbę całkowitą większą lub równą 0.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void SeedTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _seed = !string.IsNullOrEmpty(SeedTextBox.Text) ? int.Parse(SeedTextBox.Text) : 0;
+            if (int.TryParse(SeedTextBox.Text, out int value) && value >= 0)
+            {
+                _seed = value;
+                SeedTextBox.Background = new SolidColorBrush(Colors.Pink);
+            }
+            else
+            {
+                _seed = 0;
+                SeedTextBox.Background = new SolidColorBrush(Colors.LightPink);
+                MessageBox.Show("Wprowadzona wartość dla ziarna generatora liczb jest nieprawidłowa. Proszę wprowadzić liczbę całkowitą większą lub równą 0.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void CapacityTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _capacity = !string.IsNullOrEmpty(CapacityTextBox.Text) ? int.Parse(CapacityTextBox.Text) : 0;
+            if (int.TryParse(CapacityTextBox.Text, out int value) && value >= 0)
+            {
+                _capacity = value;
+                CapacityTextBox.Background = new SolidColorBrush(Colors.Pink);
+            }
+            else
+            {
+                _capacity = 0;
+                CapacityTextBox.Background = new SolidColorBrush(Colors.LightPink);
+                MessageBox.Show("Wprowadzona wartość dla pojemności jest nieprawidłowa. Proszę wprowadzić liczbę całkowitą większą lub równą 0.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
