@@ -26,7 +26,7 @@ public static class MauiProgram
         });
         builder.Services.AddSingleton<MainPageViewModel>();
         builder.Services.AddSingleton<MainPage>();
-		builder.Services.AddSingleton<FavoriteJokesPage>();
+        builder.Services.AddSingleton<FavoriteJokesPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
