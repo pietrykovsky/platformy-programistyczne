@@ -1,4 +1,5 @@
-﻿using Backend.Data.Models;
+﻿using System.Collections.ObjectModel;
+using Backend.Data.Models;
 
 namespace Backend.Services;
 
@@ -9,4 +10,8 @@ public interface IJokeService
     /// </summary>
     /// <returns>Returns a <see cref="Joke"/> object representing the fetched joke.</returns>
     Task<Joke> FetchRandomJokeAsync();
+
+    Task AddToFavorites(string jokeText);
+
+    Task<ObservableCollection<Joke>> GetFavoriteJokesAsync();
 }

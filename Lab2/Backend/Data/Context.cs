@@ -8,6 +8,7 @@ public class JokeContext : DbContext
 {
     public JokeContext(DbContextOptions<JokeContext> options) : base(options)
     {
+        Database.EnsureCreated();
     }
 
     public DbSet<Joke> Jokes { get; set; }
