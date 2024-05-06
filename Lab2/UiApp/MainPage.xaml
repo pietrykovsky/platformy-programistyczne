@@ -7,7 +7,7 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            
+
             <Label
                 Text="Super Joke App"
                 Style="{StaticResource Headline}"
@@ -19,18 +19,28 @@
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Joke" />
 
-            <Button
-                x:Name="RandomJokeBtn"
-                Text="Random" 
-                SemanticProperties.Hint="Fetch a random joke"
-                Clicked="OnJokeClicked"
-                HorizontalOptions="Fill" />
+            <HorizontalStackLayout
+                Spacing="10">
 
-            <Button
-                x:Name="NavigateBtn"
-                Text="Go to Favorites" 
-                Clicked="OnNavigateToFavoriteJokesClicked"
-                HorizontalOptions="Fill" />
+                <Button
+                    x:Name="FavoriteBtn"
+                    Text="Favorite" 
+                    Command="{Binding FavoriteCommand}"
+                    HorizontalOptions="Fill" />
+
+                <Button
+                    x:Name="RandomJokeBtn"
+                    Text="Random" 
+                    SemanticProperties.Hint="Fetch a random joke"
+                    Command="{Binding RandomJokeCommand}"
+                    HorizontalOptions="Fill" />
+
+                <Button
+                    x:Name="NavigateBtn"
+                    Text="Go to Favorites" 
+                    Command="{Binding NavigateCommand}"
+                    HorizontalOptions="Fill" />
+            </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 

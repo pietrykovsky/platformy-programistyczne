@@ -92,6 +92,25 @@ public class JokeService : IJokeService
     
     }
 
+    public Task RemoveFromFavorites(string jokeText)
+    {
+        // Find the joke in the database
+        var joke = _context.Jokes.FirstOrDefault(j => j.Text == jokeText);
+        if (joke == null)
+            return Task.CompletedTask;
+
+        // Find the favorite entry
+        var favorite = _context.Favourites.FirstOrDefault(f => f.JokeId == joke.Id);
+        if (favorite == null)
+            return Task.CompletedTask;
+
+        // Remove the favorite entry
+        _context.Favourites.Remove(favorite);
+        _context.SaveChanges();
+
+        return Task.CompletedTask;
+    }
+
 
     private class JokeApiResponse
     {

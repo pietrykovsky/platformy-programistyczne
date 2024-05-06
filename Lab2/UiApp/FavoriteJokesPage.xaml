@@ -2,11 +2,23 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="UiApp.FavoriteJokesPage"
-             Title="FavoriteJokesPage">
+             Title="Favorite Jokes">
     <VerticalStackLayout>
-        <Label 
-            Text="Favorite Jokes"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+
+        <SearchBar Placeholder="Search jokes..."
+           Text="{Binding SearchText, Mode=TwoWay}"
+           SearchCommand="{Binding PerformSearchCommand}"/>
+
+        <!-- CollectionView for displaying jokes -->
+        <CollectionView ItemsSource="{Binding FilteredJokes}" VerticalScrollBarVisibility="Always">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout Padding="10">
+                        <Label Text="{Binding Text}" FontSize="Medium"/>
+                        <Label Text="{Binding CreatedAt, StringFormat='{0:dd MMM yyyy}'}" FontSize="Small" TextColor="Gray"/>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </VerticalStackLayout>
 </ContentPage>

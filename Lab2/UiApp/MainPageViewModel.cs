@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows.Input;
 using Backend.Services;
 
 namespace UiApp;
@@ -23,10 +24,27 @@ public class MainPageViewModel : INotifyPropertyChanged
         }
     }
 
+    public ICommand NavigateCommand { get; }
+    public ICommand FavoriteCommand { get; }
+    public ICommand RandomJokeCommand { get; }
+
     public MainPageViewModel(IJokeService jokeService)
     {
         _jokeService = jokeService;
         Task.Run(UpdateJokeAsync);
+
+        RandomJokeCommand = new Command(async () =>
+        {
+            await UpdateJokeAsync();
+        });
+        NavigateCommand = new Command(async () =>
+        {
+            await Shell.Current.GoToAsync("FavoriteJokes");
+        });
+        FavoriteCommand = new Command(async () =>
+        {
+            await _jokeService.AddToFavorites(JokeText);
+        });
     }
 
     public async Task UpdateJokeAsync()

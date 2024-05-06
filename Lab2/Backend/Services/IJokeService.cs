@@ -14,4 +14,6 @@ public interface IJokeService
     Task AddToFavorites(string jokeText);
 
     Task<ObservableCollection<Joke>> GetFavoriteJokesAsync();
+
+    Task RemoveFromFavorites(string jokeText);
 }
