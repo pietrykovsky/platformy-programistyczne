@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UiApp.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+
+            <Label
+                Text="Super Joke App"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+
+            <Label
+                Text="{Binding JokeText}"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Joke" />
+
+            <HorizontalStackLayout
+                Spacing="10">
+
+                <Button
+                    x:Name="FavoriteBtn"
+                    Text="Favorite" 
+                    Command="{Binding FavoriteCommand}"
+                    HorizontalOptions="Fill" />
+
+                <Button
+                    x:Name="RandomJokeBtn"
+                    Text="Random" 
+                    SemanticProperties.Hint="Fetch a random joke"
+                    Command="{Binding RandomJokeCommand}"
+                    HorizontalOptions="Fill" />
+
+                <Button
+                    x:Name="NavigateBtn"
+                    Text="Go to Favorites" 
+                    Command="{Binding NavigateCommand}"
+                    HorizontalOptions="Fill" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
