@@ -1,0 +1,93 @@
+﻿@page "/movies"
+
+@rendermode InteractiveServer
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
+
+<h3>My Movies</h3>
+
+<label for="filter">Filter by title:</label>
+<input @bind="titleFilter" id="filter" />
+
+<button @onclick="ApplyFilter">Apply Filter</button>
+
+<label for="sortOrder">Sort by:</label>
+<select @bind="sortOrder" id="sortOrder">
+    <option value="title">Title</option>
+    <option value="releaseDate">Release Date</option>
+</select>
+
+<button @onclick="NavigateToAdd">Add</button>
+
+<ul>
+    @foreach (var movie in filteredMovies)
+    {
+        <li>
+            @movie.Title - @movie.Genre (@movie.ReleaseDate.ToString("yyyy-MM-dd"))
+            <button @onclick="() => EditMovie(movie.Id)">Edit</button>
+            <button @onclick="() => DeleteMovie(movie.Id)">Delete</button>
+        </li>
+    }
+</ul>
+
+@code {
+    private List<Movie> movies;
+    private List<Movie> filteredMovies;
+    private string titleFilter = "";
+    private string sortOrder = "title";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
+            movies = await DbContext.Movies.Where(m => m.UserId == userId).ToListAsync();
+            filteredMovies = movies;
+        }
+    }
+
+    private void ApplyFilter()
+    {
+        filteredMovies = movies.Where(m => m.Title.Contains(titleFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+        SortMovies();
+    }
+
+    private void NavigateToAdd()
+    {
+        NavigationManager.NavigateTo("/movies/add");
+    }
+
+    private void SortMovies()
+    {
+        if (sortOrder == "title")
+        {
+            filteredMovies = filteredMovies.OrderBy(m => m.Title).ToList();
+        }
+        else if (sortOrder == "releaseDate")
+        {
+            filteredMovies = filteredMovies.OrderBy(m => m.ReleaseDate).ToList();
+        }
+    }
+
+    private void EditMovie(int movieId)
+    {
+        NavigationManager.NavigateTo($"/movies/edit/{movieId}");
+    }
+
+    private async Task DeleteMovie(int movieId)
+    {
+        var movie = await DbContext.Movies.FindAsync(movieId);
+        if (movie != null)
+        {
+            DbContext.Movies.Remove(movie);
+            await DbContext.SaveChangesAsync();
+            movies.Remove(movie);
+            ApplyFilter(); // Refresh the list after deletion
+        }
+    }
+}
