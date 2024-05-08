@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 
-# Copy the entire SzczurTv solution directory
-COPY SzczurTv /SzczurTv
+# Copy the entire WebApp solution directory
+COPY Lab3 /Lab3
 
-WORKDIR /SzczurTv
+WORKDIR /Lab3
 
 # Restore NuGet packages
 RUN dotnet restore
@@ -16,4 +16,4 @@ WORKDIR /app
 COPY --from=build /app ./
 EXPOSE 80
 
-ENTRYPOINT ["dotnet", "SzczurApp.dll"]
+ENTRYPOINT ["dotnet", "WebApp.dll"]
