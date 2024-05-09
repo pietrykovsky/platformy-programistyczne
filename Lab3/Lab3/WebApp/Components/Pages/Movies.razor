@@ -6,37 +6,68 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
 
-<h3>My Movies</h3>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h3 class="mb-4">Movies</h3>
+        <div class="d-flex mb-3 justify-content-between">
+            <button class="btn btn-primary" @onclick="NavigateToAdd">Add movie</button>
+            
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Filter by title" @bind="titleFilter" @bind:after="ApplyFilter">
+                <select class="form-select" @bind="genreFilter" @bind:after="ApplyFilter">
+                    <option value="">All Genres</option>
+                    <option value="Action">Action</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Sci-Fi">Sci-Fi</option>
+                    <option value="Thriller">Thriller</option>
+                </select>
+                <select class="form-select" @bind="sortOrder" @bind:after="SortMovies">
+                    <option value="title">Title</option>
+                    <option value="releaseDate">Release Date</option>
+                    <option value="rating">Rating</option>
+                </select>
+            </div>
+        </div>
 
-<label for="filter">Filter by title:</label>
-<input @bind="titleFilter" id="filter" />
-
-<button @onclick="ApplyFilter">Apply Filter</button>
-
-<label for="sortOrder">Sort by:</label>
-<select @bind="sortOrder" id="sortOrder">
-    <option value="title">Title</option>
-    <option value="releaseDate">Release Date</option>
-</select>
-
-<button @onclick="NavigateToAdd">Add</button>
-
-<ul>
-    @foreach (var movie in filteredMovies)
-    {
-        <li>
-            @movie.Title - @movie.Genre (@movie.ReleaseDate.ToString("yyyy-MM-dd"))
-            <button @onclick="() => EditMovie(movie.Id)">Edit</button>
-            <button @onclick="() => DeleteMovie(movie.Id)">Delete</button>
-        </li>
-    }
-</ul>
+        <ul class="list-group">
+            @if (filteredMovies == null)
+            {
+                <li class="list-group-item">Loading...</li>
+            }
+            else if (filteredMovies.Count == 0)
+            {
+                <li class="list-group-item">No movies found.</li>
+            }
+            else
+            {
+                foreach (var movie in filteredMovies)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @movie.Title - @movie.Genre (@movie.ReleaseDate.ToString("dd-MM-yyyy"))
+                        <div>
+                            <InputNumber @bind-Value="movie.Rating" class="form-control" min="1" max="10" size="4" />
+                            <button class="btn btn-outline-warning" @onclick="() => UpdateMovieRating(movie)">Update Rating</button>
+                            <button class="btn btn-outline-warning" @onclick="() => EditMovie(movie.Id)">Edit</button>
+                            <button class="btn btn-danger" @onclick="() => DeleteMovie(movie.Id)">Delete</button>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</div>
 
 @code {
-    private List<Movie> movies;
-    private List<Movie> filteredMovies;
+    private List<Movie>? movies;
+    private List<Movie>? filteredMovies;
     private string titleFilter = "";
     private string sortOrder = "title";
+    private string genreFilter = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,25 +84,36 @@
 
     private void ApplyFilter()
     {
-        filteredMovies = movies.Where(m => m.Title.Contains(titleFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+        filteredMovies = movies?.Where(m => m.Title.Contains(titleFilter, StringComparison.OrdinalIgnoreCase)
+                                       && (string.IsNullOrEmpty(genreFilter) || m.Genre == genreFilter)).ToList();
         SortMovies();
+    }
+
+    private void SortMovies()
+    {
+        switch (sortOrder)
+        {
+            case "title":
+                filteredMovies = filteredMovies?.OrderBy(m => m.Title).ToList();
+                break;
+            case "releaseDate":
+                filteredMovies = filteredMovies?.OrderBy(m => m.ReleaseDate).ToList();
+                break;
+            case "rating":
+                filteredMovies = filteredMovies?.OrderByDescending(m => m.Rating).ToList();
+                break;
+        }
+    }
+
+    private async Task UpdateMovieRating(Movie movie)
+    {
+        DbContext.Movies.Update(movie);
+        await DbContext.SaveChangesAsync();
     }
 
     private void NavigateToAdd()
     {
         NavigationManager.NavigateTo("/movies/add");
-    }
-
-    private void SortMovies()
-    {
-        if (sortOrder == "title")
-        {
-            filteredMovies = filteredMovies.OrderBy(m => m.Title).ToList();
-        }
-        else if (sortOrder == "releaseDate")
-        {
-            filteredMovies = filteredMovies.OrderBy(m => m.ReleaseDate).ToList();
-        }
     }
 
     private void EditMovie(int movieId)
@@ -86,7 +128,7 @@
         {
             DbContext.Movies.Remove(movie);
             await DbContext.SaveChangesAsync();
-            movies.Remove(movie);
+            movies?.Remove(movie);
             ApplyFilter(); // Refresh the list after deletion
         }
     }

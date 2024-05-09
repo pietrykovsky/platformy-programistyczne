@@ -1,0 +1,73 @@
+﻿@page "/movies/edit/{MovieId:int}"
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
+
+<h3>Edit Movie</h3>
+
+@if (movie == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="movie" OnValidSubmit="HandleValidSubmit" FormName="EditMovieForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-floating mb-3">
+            <InputText id="title" @bind-Value="movie.Title" class="form-control" />
+            <label for="title">Title</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputSelect id="genre" @bind-Value="movie.Genre" class="form-control">
+                <option value="">Select a genre</option>
+                <option value="Action">Action</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Horror">Horror</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Thriller">Thriller</option>
+            </InputSelect>
+            <label for="genre">Genre</label>
+        </div>
+
+        <div class="form-group">
+            <InputDate id="releaseDate" class="form-control" @bind-Value="movie.ReleaseDate" />
+            <label for="releaseDate">Release Date</label>
+        </div>
+
+        <div class="form-group">
+            <InputNumber id="rating" class="form-control" @bind-Value="movie.Rating" min="1" max="10" />
+            <label for="rating">Rating</label>
+        </div>
+
+        <button type="submit" class="btn btn-success">Update</button>
+        <button class="btn btn-secondary" @onclick="NavigateToMovies">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int MovieId { get; set; }
+
+    private Movie? movie;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = await DbContext.Movies.FindAsync(MovieId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await DbContext.SaveChangesAsync();
+        NavigationManager.NavigateTo("/movies");
+    }
+
+    private void NavigateToMovies() => NavigationManager.NavigateTo("/movies");
+}

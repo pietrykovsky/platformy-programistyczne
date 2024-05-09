@@ -1,36 +1,69 @@
 ﻿@page "/movies/add"
 @rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @attribute [Authorize]
 
-<h3>Add a New Movie</h3>
-<EditForm Model="@movie" OnValidSubmit="HandleValidSubmit" FormName="AddMovieForm">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-group">
-        <label for="title">Title:</label>
-        <InputText id="title" class="form-control" @bind-Value="movie.Title" />
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <StatusMessage Message="@errorMessage" />
+            <EditForm Model="@movie" OnValidSubmit="HandleValidSubmit" FormName="AddMovieForm">
+                <DataAnnotationsValidator />
+                <h3>Add a New Movie</h3>
+                <hr />
+                <ValidationSummary class="text-danger" role="alert" />
+                <div class="form-floating mb-3">
+                    <InputText id="title" @bind-Value="movie.Title" class="form-control" autocomplete="title" aria-required="true" placeholder="Die Hard" />
+                    <label for="title" class="form-label">Title</label>
+                    <ValidationMessage For="() => movie.Title" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputSelect id="genre" @bind-Value="movie.Genre" class="form-control" aria-required="true" >
+                        <option value="">Select a genre</option>
+                        <option value="Action">Action</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Thriller">Thriller</option>
+                    </InputSelect>
+                    <label for="genre" class="form-label">Genre</label>
+                    <ValidationMessage For="() => movie.Genre" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <InputDate id="releaseDate" class="form-control" @bind-Value="movie.ReleaseDate" min="1900-01-01" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <label for="releaseDate" class="form-label">Release Date</label>
+                    <ValidationMessage For="() => movie.ReleaseDate" class="text-danger" />
+                </div>
+                <div class="form-group">
+                    <InputNumber id="rating" class="form-control" @bind-Value="movie.Rating" min="1" max="10"/>
+                    <label for="rating" class="form-label">Rating</label>
+                    <ValidationMessage For="() => movie.Rating" class="text-danger" />
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">Add Movie</button>
+                    <button class="btn btn-secondary" @onclick="NavigateToMovies">Cancel</button>
+                </div>
+            </EditForm>
+        </section>
     </div>
-    <div class="form-group">
-        <label for="genre">Genre:</label>
-        <InputText id="genre" class="form-control" @bind-Value="movie.Genre" />
-    </div>
-    <div class="form-group">
-        <label for="releaseDate">Release Date:</label>
-        <InputDate id="releaseDate" class="form-control" @bind-Value="movie.ReleaseDate" />
-    </div>
-    <div class="form-group">
-        <label for="rating">Rating:</label>
-        <InputNumber id="rating" class="form-control" @bind-Value="movie.Rating" />
-    </div>
-    <button type="submit" class="btn btn-primary">Add Movie</button>
-</EditForm>
+</div>
 
 @code {
+    private string? errorMessage;
     private Movie movie = new Movie();
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie.ReleaseDate = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+        movie.Rating = 5;
+    }
 
     private async Task HandleValidSubmit()
     {
@@ -39,21 +72,16 @@
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             movie.UserId = authState.User.FindFirst(c => c.Type.Contains("nameidentifier"))?.Value;
 
-            if (ValidateMovie(movie))
-            {
-                DbContext.Movies.Add(movie);
-                await DbContext.SaveChangesAsync();
-                NavigationManager.NavigateTo("/movies");
-            }
-            else
-            {
-                // Handle validation failure
-                throw new InvalidOperationException("Validation failed.");
-            }
+            movie.ReleaseDate = DateTime.SpecifyKind(movie.ReleaseDate, DateTimeKind.Utc);
+
+            DbContext.Movies.Add(movie);
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/movies");
         }
         catch (Exception ex)
         {
-            // Log the error or display a message
+            errorMessage = $"An error occurred: {ex.Message}";
+            StateHasChanged(); // Make sure to update the UI in case of exception
         }
     }
 
@@ -65,4 +93,6 @@
                movie.ReleaseDate != default &&
                movie.Rating >= 0 && movie.Rating <= 10;
     }
+
+    private void NavigateToMovies() => NavigationManager.NavigateTo("/movies");
 }
