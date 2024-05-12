@@ -21,6 +21,11 @@ builder.Services.AddAuthentication(options =>
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["GOOGLE_CLIENT_ID"];
+        googleOptions.ClientSecret = builder.Configuration["GOOGLE_CLIENT_SECRET"];
+    })
     .AddIdentityCookies();
 
 var connectionString = $"Host={builder.Configuration["POSTGRES_HOST"]};Database={builder.Configuration["POSTGRES_DB"]};Username={builder.Configuration["POSTGRES_USER"]};Password={builder.Configuration["POSTGRES_PASSWORD"]}";
