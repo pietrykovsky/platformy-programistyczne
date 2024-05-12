@@ -47,6 +47,9 @@
                     <ValidationMessage For="() => movie.Rating" class="text-danger" />
                 </div>
                 <div>
+                    <InputFile id="poster" class="form-control" OnChange="LoadFile" />
+                </div>
+                <div>
                     <button type="submit" class="btn btn-primary">Add Movie</button>
                     <button class="btn btn-secondary" @onclick="NavigateToMovies">Cancel</button>
                 </div>
@@ -58,6 +61,7 @@
 @code {
     private string? errorMessage;
     private Movie movie = new Movie();
+    private IBrowserFile? uploadedFile;
 
     protected override async Task OnInitializedAsync()
     {
@@ -74,24 +78,31 @@
 
             movie.ReleaseDate = DateTime.SpecifyKind(movie.ReleaseDate, DateTimeKind.Utc);
 
-            DbContext.Movies.Add(movie);
-            await DbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo("/movies");
+            if (uploadedFile != null)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(uploadedFile.Name);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+                movie.ImagePath = path;
+                
+                DbContext.Movies.Add(movie);
+                await DbContext.SaveChangesAsync();
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await uploadedFile.OpenReadStream().CopyToAsync(fs);
+                
+                NavigationManager.NavigateTo("/movies");
+            }
         }
         catch (Exception ex)
         {
             errorMessage = $"An error occurred: {ex.Message}";
-            StateHasChanged(); // Make sure to update the UI in case of exception
+            StateHasChanged();
         }
     }
 
-    private bool ValidateMovie(Movie movie)
+    private void LoadFile(InputFileChangeEventArgs e)
     {
-        // You can add any specific validation logic here
-        return !string.IsNullOrEmpty(movie.Title) &&
-               !string.IsNullOrEmpty(movie.Genre) &&
-               movie.ReleaseDate != default &&
-               movie.Rating >= 0 && movie.Rating <= 10;
+        uploadedFile = e.File;
     }
 
     private void NavigateToMovies() => NavigationManager.NavigateTo("/movies");

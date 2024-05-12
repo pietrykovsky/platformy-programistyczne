@@ -1,4 +1,5 @@
 ﻿@page "/movies/edit/{MovieId:int}"
+@rendermode InteractiveServer
 @inject ApplicationDbContext DbContext
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -47,6 +48,15 @@ else
             <label for="rating">Rating</label>
         </div>
 
+        <div class="form-group">
+            <label for="poster">Movie Poster</label>
+            <InputFile id="poster" class="form-control" OnChange="HandleFileUpload" />
+            @if (movie.ImagePath != null)
+            {
+                <img src="@ConvertToRelativeUrl(movie.ImagePath)" alt="Current Movie Poster" style="max-height: 100px; margin-top: 10px;" />
+            }
+        </div>
+
         <button type="submit" class="btn btn-success">Update</button>
         <button class="btn btn-secondary" @onclick="NavigateToMovies">Cancel</button>
     </EditForm>
@@ -63,10 +73,62 @@ else
         movie = await DbContext.Movies.FindAsync(MovieId);
     }
 
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+            
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.OpenReadStream().CopyToAsync(stream);
+            }
+            DeleteImageFile(movie.ImagePath);
+
+            movie.ImagePath = path;
+            DbContext.Update(movie);
+            await DbContext.SaveChangesAsync();
+        }
+    }
+
     private async Task HandleValidSubmit()
     {
-        await DbContext.SaveChangesAsync();
-        NavigationManager.NavigateTo("/movies");
+        if (movie != null)
+        {
+            DbContext.Update(movie);
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/movies");
+        }
+    }
+
+    private string ConvertToRelativeUrl(string absolutePath)
+    {
+        var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        if (absolutePath.StartsWith(wwwrootPath))
+        {
+            return absolutePath.Replace(wwwrootPath, "").Replace("\\", "/");
+        }
+        return absolutePath;
+    }
+
+    private void DeleteImageFile(string imagePath)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagePath);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+        }
     }
 
     private void NavigateToMovies() => NavigationManager.NavigateTo("/movies");

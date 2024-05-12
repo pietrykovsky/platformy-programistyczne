@@ -48,6 +48,7 @@
                 foreach (var movie in filteredMovies)
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <img src="@ConvertToRelativeUrl(movie.ImagePath)" alt="@movie.Title" style="max-height: 100px" /> 
                         @movie.Title - @movie.Genre (@movie.ReleaseDate.ToString("dd-MM-yyyy"))
                         <div>
                             <InputNumber @bind-Value="movie.Rating" class="form-control" min="1" max="10" size="4" />
@@ -126,10 +127,45 @@
         var movie = await DbContext.Movies.FindAsync(movieId);
         if (movie != null)
         {
+            // Remove the movie from the database
             DbContext.Movies.Remove(movie);
             await DbContext.SaveChangesAsync();
+
+            // Attempt to delete the image file from the server
+            DeleteImageFile(movie.ImagePath);
+
+            // Update the local list and UI
             movies?.Remove(movie);
             ApplyFilter(); // Refresh the list after deletion
         }
+    }
+
+    private void DeleteImageFile(string imagePath)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagePath);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
+
+    private string ConvertToRelativeUrl(string absolutePath)
+    {
+        var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        if (absolutePath.StartsWith(wwwrootPath))
+        {
+            return absolutePath.Replace(wwwrootPath, "").Replace("\\", "/");
+        }
+        return absolutePath;
     }
 }
